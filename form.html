@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios@0.19.0/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <h3>{{ textSearch }} Длина строки {{ textSearch.length }}</h3>
+      <button type="button" @click="getHashTags">Качать хэштеги</button>
+      <button type="button" @click="getHashTagsCalback">
+        Качать хэштеги через Callback
+      </button>
+      <button type="button" @click="getCities">
+        Города
+      </button>
+
+      <input type="text" size="50" v-model="textSearch" />
+
+      <ul>
+        <li v-for="el in hashTags">{{el}}</li>
+      </ul>
+
+      <ul>
+        <li v-for="el in cities">{{el.region}} : {{el.city}}</li>
+      </ul>
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: "#app",
+        data: {
+          hashTags: [],
+          cities: [],
+          url: {
+            hashtags: "https://dka-develop.ru/api?type=hashtag",
+            cities: "https://dka-develop.ru/api?type=city"
+          },
+          textSearch: ""
+        },
+        watch: {
+          textSearch: function() {
+            if (this.textSearch.length >= 3) {
+              this.textSearch = "New value of the field";
+            }
+          }
+        },
+        methods: {
+          getHashTags() {
+            // стрелочная функция не создает свой контекст
+            axios.get(this.url.hashtags).then(response => {
+              console.log(response);
+              this.hashTags = response.data;
+            });
+          },
+
+          getHashTagsCalback() {
+            // обычная создает свой контекст,
+            // поэтому ей нужно прямо указывать контекст
+            axios.get(this.url.hashtags).then(function(response) {
+              app.hashTags = response.data;
+            });
+          },
+          getCities() {
+            axios.get(this.url.cities).then(response => {
+              this.cities = response.data;
+            });
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
